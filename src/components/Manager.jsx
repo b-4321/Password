@@ -1,6 +1,7 @@
 import React, { use, useState } from "react";
 import { useRef, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 
 const Manager = () => {
   const ref = useRef();
@@ -27,9 +28,68 @@ const Manager = () => {
   };
 
   const savePassword = () => {
-    setpasswordArray([...passwordArray, form]);
-    localStorage.setItem("passwords", JSON.stringify([...passwordArray, form]));
+    if(form.site.length > 3 && form.username.length > 3 && form.password.length > 3){
+    setpasswordArray([...passwordArray, {...form, id: uuidv4() }]);
+    localStorage.setItem(
+      "passwords",
+      JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
+    );
     console.log([...passwordArray, form]);
+    setform({ site: "", username: "", password: "" });
+    toast("Password Saved Successfully ✅", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }else{
+    toast("Please fill all fields correctly ❌", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
+    };
+
+  const deletePassword = (id) => {
+    console.log("deleting password with id ", id);
+    let c = confirm("Are you sure you want to delete this password?");
+    if(c){
+        setpasswordArray(passwordArray.filter((item) => item.id !== id));
+    localStorage.setItem(
+      "passwords",
+      JSON.stringify(passwordArray.filter((item) => item.id !== id))
+    );
+    }
+    
+    
+    toast("Password Deleted ❌", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  };
+
+  const editPassword = (id) => {
+    console.log("editing password with id ", id);
+    setform(passwordArray.filter((item) => item.id === id)[0]);
+    setpasswordArray(passwordArray.filter((item) => item.id !== id));
+    
+
   };
 
   const handleChange = (e) => {
@@ -64,10 +124,9 @@ const Manager = () => {
         draggable
         pauseOnHover
         theme="dark"
-        
       />
-      <div className="absolute top-0 z-[-2] h-screen w-screen bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px]"></div>
-      <div className="bg-yellow-200 mycontainer rounded-lg  my-2">
+      <div className="absolute top-0 z-[-2] h-screen  w-screen bg-[#000000] bg-[radial-gradient(#200122,#6f0000)] bg-[size:25px_25px]"></div>
+      <div className="bg-[radial-gradient(#30E8BF,#FF8235)] md:mycontainer rounded-lg  my-2">
         <h1 className="text-4xl font-bold text- text-center">
           <span className="text-red-700"> &lt; </span>
           <span>Pass</span>
@@ -81,21 +140,21 @@ const Manager = () => {
             value={form.site}
             onChange={handleChange}
             placeholder="Enter website name"
-            className="rounded-full border border-red-700 w-full p-4 py-1"
+            className="rounded-full border border-red-700 w-full p-4 py-1 text-black"
             type="text"
             name="site"
-            id=""
+            id="site"
           />
 
-          <div className="flex w-full justify-between gap-3">
+          <div className="flex flex-col md:flex-row w-full justify-between gap-3">
             <input
               value={form.username}
               onChange={handleChange}
               placeholder="Enter username"
               type="text"
-              className="rounded-full border border-red-700 w-full p-4 py-1"
+              className="rounded-full border border-red-700 w-full p-4 py-1 text-black"
               name="username"
-              id=""
+              id="username"
             />
             <div className="relative">
               <input
@@ -104,9 +163,9 @@ const Manager = () => {
                 onChange={handleChange}
                 placeholder="Enter password"
                 type="password"
-                className="rounded-full border border-red-700 w-full p-4 py-1"
+                className="rounded-full border border-red-700 w-full p-4 py-1 text-black"
                 name="password"
-                id=""
+                id="password"
               />
               <span
                 className="absolute right-[4px] top-[4px] cursor-pointer "
@@ -152,8 +211,8 @@ const Manager = () => {
                 {passwordArray.map((item, index) => {
                   return (
                     <tr key={index}>
-                      <td className="py-2 border border-white text-center">
-                        <div className="items-center justify-center flex">
+                      <td className="py-2 border border-white text-center ">
+                        <div className="items-center justify-center flex ">
                           <a href={item.site} target="_blank">
                             {item.site}
                           </a>
@@ -201,10 +260,16 @@ const Manager = () => {
                         </div>
                       </td>
                       <td className="flex justify-center items-center py-2 border border-white text-center">
-                        <span className="cursor-pointer mx-2">
+                        <span
+                          className="cursor-pointer mx-2"
+                          onClick={() => editPassword(item.id)}
+                        >
                           <img className="w-10" src="edit.png" alt="" />
                         </span>
-                        <span className="cursor-pointer mx-2">
+                        <span
+                          className="cursor-pointer mx-2"
+                          onClick={() => deletePassword(item.id)}
+                        >
                           <img className="w-9" src="delete.png" alt="" />
                         </span>
                       </td>
