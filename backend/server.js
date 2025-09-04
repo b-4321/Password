@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const { MongoClient } = require("mongodb");
 const bodyparser = require('body-parser');
+const cors = require('cors');
 
 dotenv.config()
 
@@ -12,6 +13,7 @@ const client = new MongoClient(url);
 
 const dbName = "passop";
 const app = express()
+app.use(cors());
 const port = 3000
 app.use(bodyparser.json());
 
@@ -22,25 +24,27 @@ app.get('/', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection("documents");
     const findResult = await collection.find({}).toArray();
-  res.json(findResult)
+    res.json(findResult)
 })
 
 //save a password
 app.post("/", async (req, res) => {
   const password = req.body;
   const db = client.db(dbName);
-  const collection = db.collection("documents");
+  const collection = db.collection("passwords");
   const findResult = await collection.insertOne(password);
-  res.send({success: true});
+  res.send({success: true, result: findResult});
 });
 
 //delete a password
-app.delete("/:id", async (req, res) => {
+app.delete("/", async (req, res) => {
+  const password = req.body;
   const db = client.db(dbName);
-  const collection = db.collection("documents");
-  const deleteResult = await collection.deleteOne({ _id: new ObjectId(req.params.id) });
-  res.json(deleteResult);
+  const collection = db.collection("passwords");
+  const findResult = await collection.deleteOne(password);
+  res.send({ success: true, result: findResult });
 });
+
 
 app.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`)

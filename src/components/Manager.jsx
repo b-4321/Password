@@ -8,6 +8,7 @@ const Manager = () => {
   const passwordRef = useRef();
   const [form, setform] = useState({ site: "", username: "", password: "" });
   const [passwordArray, setpasswordArray] = useState([]);
+  
 
   useEffect(() => {
     let passwords = localStorage.getItem("passwords");

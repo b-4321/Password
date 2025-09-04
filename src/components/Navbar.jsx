@@ -19,7 +19,7 @@ const Navbar = () => {
       </ul> */}
       <button className='flex items-center'>
         <img className='cursor-pointer p-1' width={30} src="github.png" alt="GitHub Logo" />
-        <span className='font-bold'>Github</span>
+        <span className='font-bold' onClick={() => window.open("https://github.com/your-repo", "_blank")}>Github</span>
       </button>
         </div>
     </nav>
